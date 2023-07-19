@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	peer2 "google.golang.org/grpc/peer"
+	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -62,6 +63,7 @@ func NewGRPCServer(config *GrpcConfig, opts ...grpc.ServerOption) (*grpc.Server,
 		return nil, err
 	} else {
 		grpc_api.RegisterSensorSphereServiceServer(gsrv, srv)
+		reflection.Register(gsrv)
 		return gsrv, nil
 	}
 }

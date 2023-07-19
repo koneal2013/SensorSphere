@@ -1,4 +1,4 @@
-package server
+package server_test
 
 import (
 	"bytes"
@@ -11,10 +11,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 
 	"github.com/koneal2013/sensorsphere/internal/models"
+	"github.com/koneal2013/sensorsphere/internal/server"
 )
 
 // MockDb is a mock type for db.Db
@@ -30,10 +31,10 @@ func (m *MockDb) CreateSensor(ctx context.Context, sensor *models.Sensor) (*mode
 }
 
 // GetSensor is a mock implementation of db.Db.GetSensor
-func (m *MockDb) GetSensor(ctx context.Context, name string) ([]*models.Sensor, error) {
+func (m *MockDb) GetSensor(ctx context.Context, name string) (*models.Sensor, error) {
 	args := m.Called(ctx, name)
 
-	return args.Get(0).([]*models.Sensor), args.Error(1)
+	return args.Get(0).(*models.Sensor), args.Error(1)
 }
 
 // UpdateSensor is a mock implementation of db.Db.UpdateSensor
@@ -66,12 +67,27 @@ func (m *MockDb) CreateSensorReading(ctx context.Context,
 	return args.Get(0).(*models.SensorReading), args.Error(1)
 }
 
+// Close is a mock implementation of db.Db.Close
+func (m *MockDb) Close() error {
+	args := m.Called()
+
+	return args.Error(0)
+}
+
+// RunMigration is a mock implementation of db.Db.RunMigration
+func (m *MockDb) RunMigrations() error {
+	args := m.Called()
+
+	return args.Error(0)
+}
+
 func TestHandleCreateSensor(t *testing.T) {
 	// Create a new instance of our mock Db
 	mockDB := new(MockDb)
 
-	// Create a new HTTP server with the mock database
-	server := NewHTTPServer(&HttpConfig{Port: 8080}, mockDB)
+	// Create a new HTTP svr with the mock database
+	svr, err := server.NewHTTPServer(&server.HttpConfig{Port: 8080, Db: mockDB})
+	require.NoError(t, err)
 
 	// Create a new sensor
 	sensor := models.Sensor{Name: "Test Sensor"}
@@ -89,15 +105,15 @@ func TestHandleCreateSensor(t *testing.T) {
 	rr := httptest.NewRecorder()
 
 	// Serve the request using the router
-	server.Handler.ServeHTTP(rr, req)
+	svr.Handler.ServeHTTP(rr, req)
 
 	// Check the status code
-	assert.Equal(t, http.StatusOK, rr.Code)
+	require.Equal(t, http.StatusOK, rr.Code)
 
 	// Check the response body
 	expected := `{"name":"Test Sensor","location":{"longitude":0,"latitude":0},"tags":null}
 `
-	assert.Equal(t, expected, rr.Body.String())
+	require.Equal(t, expected, rr.Body.String())
 
 	// Assert that the expectations were met
 	mockDB.AssertExpectations(t)
@@ -108,13 +124,14 @@ func TestHandleGetSensor(t *testing.T) {
 	mockDB := new(MockDb)
 
 	// Create a new HTTP server with the mock database
-	server := NewHTTPServer(&HttpConfig{Port: 8080}, mockDB)
+	svr, err := server.NewHTTPServer(&server.HttpConfig{Port: 8080, Db: mockDB})
+	require.NoError(t, err)
 
 	// Create a new sensor
 	sensor := models.Sensor{Name: "Test Sensor"}
 
 	// Setup expectations
-	mockDB.On("GetSensor", mock.Anything, sensor.Name).Return([]*models.Sensor{&sensor}, nil)
+	mockDB.On("GetSensor", mock.Anything, sensor.Name).Return(&sensor, nil)
 
 	// Create a new HTTP request
 	req, _ := http.NewRequest(http.MethodGet, "/sensors/"+sensor.Name, io.NopCloser(bytes.NewReader(nil)))
@@ -123,15 +140,15 @@ func TestHandleGetSensor(t *testing.T) {
 	rr := httptest.NewRecorder()
 
 	// Serve the request using the router
-	server.Handler.ServeHTTP(rr, req)
+	svr.Handler.ServeHTTP(rr, req)
 
 	// Check the status code
-	assert.Equal(t, http.StatusOK, rr.Code)
+	require.Equal(t, http.StatusOK, rr.Code)
 
 	// Check the response body
-	expected := `[{"name":"Test Sensor","location":{"longitude":0,"latitude":0},"tags":null}]
+	expected := `{"name":"Test Sensor","location":{"longitude":0,"latitude":0},"tags":null}
 `
-	assert.Equal(t, expected, rr.Body.String())
+	require.Equal(t, expected, rr.Body.String())
 
 	// Assert that the expectations were met
 	mockDB.AssertExpectations(t)
@@ -141,8 +158,9 @@ func TestHandleUpdateSensor(t *testing.T) {
 	// Create a new instance of our mock Db
 	mockDB := new(MockDb)
 
-	// Create a new HTTP server with the mock database
-	server := NewHTTPServer(&HttpConfig{Port: 8080}, mockDB)
+	// Create a new HTTP svr with the mock database
+	svr, err := server.NewHTTPServer(&server.HttpConfig{Port: 8080, Db: mockDB})
+	require.NoError(t, err)
 
 	// Create a new sensor
 	sensor := models.Sensor{Name: "Test Sensor"}
@@ -160,15 +178,15 @@ func TestHandleUpdateSensor(t *testing.T) {
 	rr := httptest.NewRecorder()
 
 	// Serve the request using the router
-	server.Handler.ServeHTTP(rr, req)
+	svr.Handler.ServeHTTP(rr, req)
 
 	// Check the status code
-	assert.Equal(t, http.StatusOK, rr.Code)
+	require.Equal(t, http.StatusOK, rr.Code)
 
 	// Check the response body
 	expected := `1
 `
-	assert.Equal(t, expected, rr.Body.String())
+	require.Equal(t, expected, rr.Body.String())
 
 	// Assert that the expectations were met
 	mockDB.AssertExpectations(t)
@@ -179,7 +197,8 @@ func TestHandleGetNearestSensor(t *testing.T) {
 	mockDB := new(MockDb)
 
 	// Create a new HTTP server with the mock database
-	server := NewHTTPServer(&HttpConfig{Port: 8080}, mockDB)
+	svr, err := server.NewHTTPServer(&server.HttpConfig{Port: 8080, Db: mockDB})
+	require.NoError(t, err)
 
 	// Create a new location
 	location := models.Location{Longitude: 0, Latitude: 0}
@@ -200,15 +219,15 @@ func TestHandleGetNearestSensor(t *testing.T) {
 	rr := httptest.NewRecorder()
 
 	// Serve the request using the router
-	server.Handler.ServeHTTP(rr, req)
+	svr.Handler.ServeHTTP(rr, req)
 
 	// Check the status code
-	assert.Equal(t, http.StatusOK, rr.Code)
+	require.Equal(t, http.StatusOK, rr.Code)
 
 	// Check the response body
 	expected := `{"name":"Test Sensor","location":{"longitude":0,"latitude":0},"tags":null}
 `
-	assert.Equal(t, expected, rr.Body.String())
+	require.Equal(t, expected, rr.Body.String())
 
 	// Assert that the expectations were met
 	mockDB.AssertExpectations(t)
@@ -219,7 +238,8 @@ func TestHandleCreateSensorReading(t *testing.T) {
 	mockDB := new(MockDb)
 
 	// Create a new HTTP server with the mock database
-	server := NewHTTPServer(&HttpConfig{Port: 8080}, mockDB)
+	svr, err := server.NewHTTPServer(&server.HttpConfig{Port: 8080, Db: mockDB})
+	require.NoError(t, err)
 
 	// Create a new sensor reading
 	reading := models.SensorReading{SensorName: "Test Sensor", Value: 1.0}
@@ -237,15 +257,15 @@ func TestHandleCreateSensorReading(t *testing.T) {
 	rr := httptest.NewRecorder()
 
 	// Serve the request using the router
-	server.Handler.ServeHTTP(rr, req)
+	svr.Handler.ServeHTTP(rr, req)
 
 	// Check the status code
-	assert.Equal(t, http.StatusOK, rr.Code)
+	require.Equal(t, http.StatusOK, rr.Code)
 
 	// Check the response body
 	expected := `{"sensorName":"Test Sensor","time":"0001-01-01T00:00:00Z","value":1}
 `
-	assert.Equal(t, expected, rr.Body.String())
+	require.Equal(t, expected, rr.Body.String())
 
 	// Assert that the expectations were met
 	mockDB.AssertExpectations(t)
@@ -256,7 +276,8 @@ func TestHandleGetSensorReadingsForTimeRange(t *testing.T) {
 	mockDB := new(MockDb)
 
 	// Create a new HTTP server with the mock database
-	server := NewHTTPServer(&HttpConfig{Port: 8080}, mockDB)
+	svr, err := server.NewHTTPServer(&server.HttpConfig{Port: 8080, Db: mockDB})
+	require.NoError(t, err)
 
 	// Create a new time range query
 	timeRangeQuery := models.TimeRangeQuery{
@@ -284,10 +305,10 @@ func TestHandleGetSensorReadingsForTimeRange(t *testing.T) {
 	rr := httptest.NewRecorder()
 
 	// Serve the request using the router
-	server.Handler.ServeHTTP(rr, req)
+	svr.Handler.ServeHTTP(rr, req)
 
 	// Check the status code
-	assert.Equal(t, http.StatusOK, rr.Code)
+	require.Equal(t, http.StatusOK, rr.Code)
 
 	// Check the response body
 	expected := fmt.Sprintf(
@@ -296,7 +317,7 @@ func TestHandleGetSensorReadingsForTimeRange(t *testing.T) {
 		sensorReadings[1].Time.Format(time.RFC3339Nano),
 	)
 
-	assert.Equal(t, expected, rr.Body.String())
+	require.Equal(t, expected, rr.Body.String())
 
 	// Assert that the expectations were met
 	mockDB.AssertExpectations(t)
