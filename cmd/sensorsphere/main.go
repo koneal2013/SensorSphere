@@ -1,30 +1,3 @@
-// database, err := db.New(db.PgConfig{
-// 	Host:     "localhost",
-// 	Port:     5432,
-// 	User:     "postgres",
-// 	Password: "mysecretpassword",
-// 	Dbname:   "sensor_sphere",
-// })
-// if err != nil {
-// 	panic(err)
-// }
-//
-// defer func(database *db.Db) {
-// 	err := database.Close()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// }(database)
-//
-// svr := server.NewHTTPServer(&server.HttpConfig{
-// 	Port: 8080,
-// }, database)
-//
-// err = svr.ListenAndServe()
-// if err != nil {
-// 	panic(err)
-// }
-
 package main
 
 import (
