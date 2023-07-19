@@ -167,7 +167,8 @@ func (s *grpcServer) CreateSensorReading(ctx context.Context, in *grpc_api.Senso
 	return modelReadingToAPI(sensorReading), nil
 }
 
-func (s *grpcServer) GetSensorReadingsForTimeRange(ctx context.Context, in *grpc_api.TimeRangeQuery) (*grpc_api.SensorReadingsResponse, error) {
+func (s *grpcServer) GetSensorReadingsForTimeRange(ctx context.Context,
+	in *grpc_api.TimeRangeQuery) (*grpc_api.SensorReadingsResponse, error) {
 	ctx, span := s.grpcTracer.Start(ctx, "GetSensorReadingsForTimeRange")
 	defer span.End()
 
