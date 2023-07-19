@@ -13,25 +13,38 @@ These instructions will help you get a copy of the project up and running on you
 - Docker
 - Go (version 1.16 or later)
 
-### Installation
+## Installation
 
 1. Clone the repository:
-
-```bash
-git clone https://github.com/koneal2013/SensorSphere.git
-```
-
+   
+   ```bash
+   git clone https://github.com/koneal2013/SensorSphere.git
+   ```
 2. Navigate to the project directory:
+   
+   ```bash
+   cd SensorSphere
+   ```
+3. Build and Start Docker containers:
+   
+   ```bash
+   make docker-start
+   ```
+   
+   - To stop the containers, run:
+     ```bash
+     make docker-down
+     ```
+
+Note: Make sure you have Docker and Docker Compose installed on your machine as the project runs in a Dockerized environment.
+
+## Testing
+
+To run the tests, use the following Makefile command:
 
 ```bash
-cd SensorSphere
-```
+make test
 
-3. Build the Docker images:
-
-```bash
-docker-compose build
-```
 
 ### Running the Application
 
@@ -65,6 +78,49 @@ The project includes unit tests for the database functions. You can run the test
 ```bash
 go test ./...
 ```
+
+# Monitoring and Tracing with Prometheus, Jaeger, and Zipkin
+
+SensorSphere integrates with Prometheus, Jaeger, and Zipkin to provide comprehensive monitoring and tracing capabilities.
+
+## Prometheus
+
+Prometheus is an open-source systems monitoring and alerting toolkit. SensorSphere exports metrics to Prometheus, which can then be visualized in Grafana. This allows you to monitor the performance and health of the SensorSphere service.
+
+To access Prometheus:
+
+1. Navigate to `http://localhost:9090`.
+2. Use the expression browser for ad-hoc querying.
+
+## Jaeger
+
+Jaeger is an open-source, end-to-end distributed tracing system that helps developers monitor and troubleshoot complex, microservice-based architectures. It's used for monitoring and troubleshooting microservices-based distributed systems, including:
+
+- Distributed context propagation
+- Distributed transaction monitoring
+- Root cause analysis
+- Service dependency analysis
+- Performance / latency optimization
+
+To access Jaeger:
+
+1. Navigate to `http://localhost:16686`.
+2. Use the search functionality to find specific traces.
+
+## Zipkin
+
+Zipkin is a distributed tracing system that helps gather timing data needed to troubleshoot latency problems in service architectures. It manages both the collection and lookup of this data through a Collector and a Query service. SensorSphere uses Zipkin to trace requests as they pass through the various services, providing a detailed view of the request path and latency data.
+
+To access Zipkin:
+
+1. Navigate to `http://localhost:9411`.
+2. Use the search functionality to find specific traces.
+
+For more detailed information on these integrations, please refer to the respective official documentation:
+
+- [Prometheus](https://prometheus.io/docs/introduction/overview/)
+- [Jaeger](https://www.jaegertracing.io/docs/1.22/)
+- [Zipkin](https://zipkin.io/pages/documentation.html)
 
 ## Contributing
 
