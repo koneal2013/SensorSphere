@@ -19,7 +19,7 @@ SELECT create_hypertable('sensor_readings', 'time');
 -- +goose Down
 -- +goose StatementBegin
 DROP TABLE IF EXISTS sensor_readings;
-DROP TABLE IF EXISTS sensor;
+DROP TABLE IF EXISTS sensors;
 DROP EXTENSION IF EXISTS "postgis";
 DROP EXTENSION IF EXISTS timescaledb;
 -- +goose StatementEnd
