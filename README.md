@@ -44,17 +44,7 @@ To run the tests, use the following Makefile command:
 
 ```bash
 make test
-
-
-### Running the Application
-
-1. Start the services:
-
-```bash
-docker-compose up
 ```
-
-The application should now be running and accessible on the specified ports.
 
 ## Usage
 
@@ -131,7 +121,6 @@ SensorSphere provides a base solution for sensor data management, there are seve
 3. **Performance Optimizations:** As with any system, performance can almost always be improved. This could include things like query optimization, caching, or parallel processing of requests.
 4. **Security Enhancements:** While the system does include basic security measures, there are many additional security enhancements that could be added. This could include things like rate limiting, more advanced authentication mechanisms, or improved encryption..
 5. **Automated Testing:** While the project does include some tests, the coverage could be expanded.
-
 
 ## Questions
 
