@@ -61,14 +61,6 @@ The application provides several endpoints for managing sensor data:
 
 The project includes Swagger documentation for its HTTP API. You can access the Swagger UI at `http://localhost:8080/swagger/` when the application is running.
 
-## Tests
-
-The project includes unit tests for the database functions. You can run the tests using the following command:
-
-```bash
-go test ./...
-```
-
 # Monitoring and Tracing with Prometheus, Jaeger, and Zipkin
 
 SensorSphere integrates with Prometheus, Jaeger, and Zipkin to provide comprehensive monitoring and tracing capabilities.
