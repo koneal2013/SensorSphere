@@ -73,6 +73,10 @@ func (s *SensorSphere) HandleCreateSensor(ctx context.Context, in models.Sensor)
 	ctx, span := s.HttpTracer.Start(ctx, "HandleCreateSensor")
 	defer span.End()
 
+	if in.Name == "" || in.Location.Latitude == 0.0 || in.Location.Longitude == 0.0 || in.Tags == nil {
+		return nil, fmt.Errorf("missing required fields")
+	}
+
 	sensor, err := s.database.CreateSensor(ctx, &in)
 	if err != nil {
 		return &models.Sensor{}, err
@@ -93,7 +97,12 @@ func (s *SensorSphere) HandleGetSensor(ctx context.Context, in map[string]string
 	ctx, span := s.HttpTracer.Start(ctx, "HandleGetSensor")
 	defer span.End()
 
-	sensor, err := s.database.GetSensor(ctx, in["name"])
+	sensorName, ok := in["name"]
+	if !ok {
+		return nil, fmt.Errorf("missing required fields")
+	}
+
+	sensor, err := s.database.GetSensor(ctx, sensorName)
 	if err != nil {
 		return nil, err
 	}
@@ -113,6 +122,10 @@ func (s *SensorSphere) HandleGetSensorReadingsForTimeRange(ctx context.Context,
 	in models.TimeRangeQuery) ([]*models.SensorReading, error) {
 	ctx, span := s.HttpTracer.Start(ctx, "HandleGetSensorReadingsForTimeRange")
 	defer span.End()
+
+	if in.SensorName == "" || in.EndTime.IsZero() || in.StartTime.IsZero() {
+		return nil, fmt.Errorf("missing required fields")
+	}
 
 	sensorReadings, err := s.database.GetSensorReadingsForTimeRange(ctx, in)
 	if err != nil {
@@ -134,6 +147,10 @@ func (s *SensorSphere) HandleUpdateSensor(ctx context.Context, in models.Sensor)
 	ctx, span := s.HttpTracer.Start(ctx, "HandleUpdateSensor")
 	defer span.End()
 
+	if in.Name == "" || in.Location.Latitude == 0.0 || in.Location.Longitude == 0.0 || in.Tags == nil {
+		return 0, fmt.Errorf("missing required fields")
+	}
+
 	rows, err := s.database.UpdateSensor(ctx, &in)
 	if err != nil {
 		return 0, err
@@ -153,6 +170,10 @@ func (s *SensorSphere) HandleUpdateSensor(ctx context.Context, in models.Sensor)
 func (s *SensorSphere) HandleGetNearestSensor(ctx context.Context, in models.Location) (*models.Sensor, error) {
 	ctx, span := s.HttpTracer.Start(ctx, "HandleGetNearestSensor")
 	defer span.End()
+
+	if in.Latitude == 0.0 || in.Longitude == 0.0 {
+		return nil, fmt.Errorf("missing required fields")
+	}
 
 	sensor, err := s.database.GetNearestSensor(ctx, &in)
 	if err != nil {
@@ -175,6 +196,10 @@ func (s *SensorSphere) HandleCreateSensorReading(ctx context.Context,
 ) (*models.SensorReading, error) {
 	ctx, span := s.HttpTracer.Start(ctx, "HandleCreateSensorReading")
 	defer span.End()
+
+	if reading.SensorName == "" || reading.Value == 0.0 {
+		return nil, fmt.Errorf("missing required fields")
+	}
 
 	sensorReading, err := s.database.CreateSensorReading(ctx, &reading)
 	if err != nil {

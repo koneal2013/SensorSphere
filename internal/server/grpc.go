@@ -88,6 +88,10 @@ func (s *grpcServer) CreateSensor(ctx context.Context, in *grpc_api.Sensor) (*gr
 	ctx, span := s.grpcTracer.Start(ctx, "CreateSensor")
 	defer span.End()
 
+	if in.Name == "" || in.Location.Latitude == 0.0 || in.Location.Longitude == 0.0 || in.Tags == nil {
+		return nil, status.Error(codes.InvalidArgument, "missing required fields")
+	}
+
 	newSensor := apiSensorToModel(in)
 	sensor, err := s.database.CreateSensor(ctx, newSensor)
 	if err != nil {
@@ -101,6 +105,10 @@ func (s *grpcServer) GetSensor(ctx context.Context, in *grpc_api.GetSensorReques
 	ctx, span := s.grpcTracer.Start(ctx, "GetSensor")
 	defer span.End()
 
+	if in.Name == "" {
+		return nil, status.Error(codes.InvalidArgument, "missing required fields")
+	}
+
 	sensor, err := s.database.GetSensor(ctx, in.Name)
 	if err != nil {
 		return nil, err
@@ -111,6 +119,10 @@ func (s *grpcServer) GetSensor(ctx context.Context, in *grpc_api.GetSensorReques
 func (s *grpcServer) UpdateSensor(ctx context.Context, in *grpc_api.Sensor) (*grpc_api.UpdateSensorResponse, error) {
 	ctx, span := s.grpcTracer.Start(ctx, "UpdateSensor")
 	defer span.End()
+
+	if in.Name == "" || in.Location.Latitude == 0.0 || in.Location.Longitude == 0.0 || in.Tags == nil {
+		return nil, status.Error(codes.InvalidArgument, "missing required fields")
+	}
 
 	updatedSensor := apiSensorToModel(in)
 	rows, err := s.database.UpdateSensor(ctx, updatedSensor)
@@ -125,6 +137,10 @@ func (s *grpcServer) GetNearestSensor(ctx context.Context, in *grpc_api.Location
 	ctx, span := s.grpcTracer.Start(ctx, "GetNearestSensor")
 	defer span.End()
 
+	if in.Latitude == 0.0 || in.Longitude == 0.0 {
+		return nil, status.Error(codes.InvalidArgument, "missing required fields")
+	}
+
 	location := apiLocationToModel(in)
 	sensor, err := s.database.GetNearestSensor(ctx, location)
 	if err != nil {
@@ -138,6 +154,10 @@ func (s *grpcServer) CreateSensorReading(ctx context.Context, in *grpc_api.Senso
 	ctx, span := s.grpcTracer.Start(ctx, "CreateSensorReading")
 	defer span.End()
 
+	if in.SensorName == "" || in.Value == 0.0 {
+		return nil, status.Error(codes.InvalidArgument, "missing required fields")
+	}
+
 	reading := apiReadingToModel(in)
 	sensorReading, err := s.database.CreateSensorReading(ctx, reading)
 	if err != nil {
@@ -150,6 +170,10 @@ func (s *grpcServer) CreateSensorReading(ctx context.Context, in *grpc_api.Senso
 func (s *grpcServer) GetSensorReadingsForTimeRange(ctx context.Context, in *grpc_api.TimeRangeQuery) (*grpc_api.SensorReadingsResponse, error) {
 	ctx, span := s.grpcTracer.Start(ctx, "GetSensorReadingsForTimeRange")
 	defer span.End()
+
+	if in.SensorName == "" || in.StartTime.AsTime().IsZero() || in.EndTime.AsTime().IsZero() {
+		return nil, status.Error(codes.InvalidArgument, "missing required fields")
+	}
 
 	timeRange := apiTimeRangeQueryToModel(in)
 	sensorReadings, err := s.database.GetSensorReadingsForTimeRange(ctx, timeRange)
