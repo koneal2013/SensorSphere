@@ -92,7 +92,7 @@ func (a *Agent) setupDatabase() error {
 func (a *Agent) setupServers() error {
 	if authorizer, err := auth.New(a.Config.ACLModelFile, a.Config.ACLPolicyFile); err != nil {
 		return err
-	} else if tp, err := observability.NewTrace(fmt.Sprintf("storymetadatagenerator.%s", a.Config.NodeName),
+	} else if tp, err := observability.NewTrace(fmt.Sprintf("sensorsphere.%s", a.Config.NodeName),
 		a.Config.OTPLCollectorURL, a.Config.OTPLCollectorInsecure); err != nil {
 		return err
 	} else {

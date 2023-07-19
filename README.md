@@ -129,13 +129,9 @@ SensorSphere provides a base solution for sensor data management, there are seve
 1. **Expanded API Functionality:** The current API provides a solid foundation, but there are many more operations that could be useful in a production environment. For example, more complex queries, bulk operations, or real-time updates via websockets or server-sent events.
 2. **Improved Error Handling:** While the current system does include basic error handling, there is always room for improvement. More granular error messages, retries for certain types of failures, and better logging could all contribute to a more robust system.
 3. **Performance Optimizations:** As with any system, performance can almost always be improved. This could include things like query optimization, caching, or parallel processing of requests.
-4. **Security Enhancements:** While the system does include basic security measures, there are many additional security enhancements that could be added. This could include things like rate limiting, more advanced authentication mechanisms, or improved encryption.
-5. **User Interface:** Currently, SensorSphere is a backend service with no user interface. A web or mobile UI could be developed to allow users to interact with the system more easily.
-6. **Automated Testing:** While the project does include some tests, the coverage could be expanded.
+4. **Security Enhancements:** While the system does include basic security measures, there are many additional security enhancements that could be added. This could include things like rate limiting, more advanced authentication mechanisms, or improved encryption..
+5. **Automated Testing:** While the project does include some tests, the coverage could be expanded.
 
-## Contributing
-
-Contributions are welcome. Please feel free to open an issue or submit a pull request.
 
 ## Questions
 

@@ -26,6 +26,6 @@ func configFile(filename string) string {
 	if homeDir, err := os.UserHomeDir(); err != nil {
 		panic(err)
 	} else {
-		return filepath.Join(homeDir, ".storymetadatagenerator", filename)
+		return filepath.Join(homeDir, ".sensorsphere", filename)
 	}
 }
