@@ -150,7 +150,8 @@ func (s *grpcServer) GetNearestSensor(ctx context.Context, in *grpc_api.Location
 	return modelSensorToAPI(sensor), nil
 }
 
-func (s *grpcServer) CreateSensorReading(ctx context.Context, in *grpc_api.SensorReading) (*grpc_api.SensorReading, error) {
+func (s *grpcServer) CreateSensorReading(ctx context.Context,
+	in *grpc_api.SensorReading) (*grpc_api.SensorReading, error) {
 	ctx, span := s.grpcTracer.Start(ctx, "CreateSensorReading")
 	defer span.End()
 
