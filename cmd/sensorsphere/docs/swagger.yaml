@@ -1,0 +1,185 @@
+definitions:
+  models.Location:
+    properties:
+      latitude:
+        type: number
+      longitude:
+        type: number
+    type: object
+  models.Sensor:
+    properties:
+      location:
+        $ref: '#/definitions/models.Location'
+      name:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+    type: object
+  models.SensorReading:
+    properties:
+      sensorName:
+        type: string
+      time:
+        type: string
+      value:
+        type: number
+    type: object
+  models.TimeRangeQuery:
+    properties:
+      endTime:
+        type: string
+      sensorName:
+        type: string
+      startTime:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /sensor_readings:
+    get:
+      consumes:
+      - application/json
+      description: Get sensor readings for a specific time range
+      parameters:
+      - description: Time range query
+        in: body
+        name: timeRangeQuery
+        required: true
+        schema:
+          $ref: '#/definitions/models.TimeRangeQuery'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.SensorReading'
+            type: array
+      summary: Get sensor readings for a time range
+      tags:
+      - sensor_readings
+    post:
+      consumes:
+      - application/json
+      description: Create a new sensor reading with the input payload
+      parameters:
+      - description: Create sensor reading
+        in: body
+        name: sensorReading
+        required: true
+        schema:
+          $ref: '#/definitions/models.SensorReading'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SensorReading'
+      summary: Create a new sensor reading
+      tags:
+      - sensor_readings
+  /sensors:
+    post:
+      consumes:
+      - application/json
+      description: Create a new sensor with the input payload
+      parameters:
+      - description: Create sensor
+        in: body
+        name: sensor
+        required: true
+        schema:
+          $ref: '#/definitions/models.Sensor'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Sensor'
+      summary: Create a new sensor
+      tags:
+      - sensors
+  /sensors/{name}:
+    get:
+      consumes:
+      - application/json
+      description: Get a sensor by its name
+      parameters:
+      - description: Sensor name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Sensor'
+      summary: Get a sensor
+      tags:
+      - sensors
+    put:
+      consumes:
+      - application/json
+      description: Update a sensor with the input payload
+      parameters:
+      - description: Update sensor
+        in: body
+        name: sensor
+        required: true
+        schema:
+          $ref: '#/definitions/models.Sensor'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Update a sensor
+      tags:
+      - sensors
+  /sensors/nearest:
+    get:
+      consumes:
+      - application/json
+      description: Get the nearest sensor to a specific location
+      parameters:
+      - description: Location
+        in: body
+        name: location
+        required: true
+        schema:
+          $ref: '#/definitions/models.Location'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Sensor'
+      summary: Get the nearest sensor
+      tags:
+      - sensors
+  /status:
+    get:
+      description: Returns 200 OK if server is ready to accept requests
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Server is running
+          schema:
+            type: string
+      summary: Get server status
+      tags:
+      - status
+swagger: "2.0"

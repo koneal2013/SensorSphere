@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package sensorsphere.v1;
+
+option go_package = "github.com/koneal2013/sensorsphere/api/sensorsphere_v1";
+
+import "google/protobuf/timestamp.proto";
+
+message Sensor {
+  string name = 1;
+  Location location = 2;
+  repeated string tags = 3;
+}
+
+message Location {
+  double longitude = 1;
+  double latitude = 2;
+}
+
+message SensorReading {
+  string sensor_name = 1;
+  double value = 2;
+  google.protobuf.Timestamp time = 3;
+}
+
+message TimeRangeQuery {
+  string sensor_name = 1;
+  google.protobuf.Timestamp start_time = 2;
+  google.protobuf.Timestamp end_time = 3;
+}
+
+service SensorSphereService {
+  rpc CreateSensor(Sensor) returns (Sensor) {}
+  rpc GetSensor(GetSensorRequest) returns (Sensor) {}
+  rpc UpdateSensor(Sensor) returns (UpdateSensorResponse) {}
+  rpc GetNearestSensor(Location) returns (Sensor) {}
+  rpc CreateSensorReading(SensorReading) returns (SensorReading) {}
+  rpc GetSensorReadingsForTimeRange(TimeRangeQuery) returns (SensorReadingsResponse) {}
+}
+
+message GetSensorRequest {
+  string name = 1;
+}
+
+message UpdateSensorResponse {
+  int64 rows_affected = 1;
+}
+
+message SensorReadingsResponse {
+  repeated SensorReading sensor_readings = 1;
+}

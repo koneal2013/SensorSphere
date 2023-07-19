@@ -1,0 +1,7 @@
+{
+  "db-name": "sensor_sphere",
+  "db-user": "postgres",
+  "db-password": "mysecretpassword",
+  "db-host": "postgres",
+  "db-port": 5432
+}
